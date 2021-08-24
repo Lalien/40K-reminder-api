@@ -58,7 +58,7 @@ class ImportUnitsCommand extends Command
                     'unit_id' => $unit->getId()
                 ]);
                 if (!$factionUnit) {
-                    $factionU    nit = new FactionUnit();
+                    $factionUnit = new FactionUnit();
                     $factionUnit->setUnit($unit);
                     $factionUnit->setFaction($faction);
                     $this->em->persist($factionUnit);
