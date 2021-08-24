@@ -10,6 +10,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Unit;
+use App\Entity\FactionUnit;
+use App\Entity\Faction;
 
 class ImportUnitsCommand extends Command
 {
@@ -36,6 +38,7 @@ class ImportUnitsCommand extends Command
         while ($data = fgetcsv($csv,1000,',')) {
             $unitName = $data[0];
             $isCharacter = $data[1];
+            $factionName = $data[2];
             $unit = $this->em->getRepository(Unit::class,'unit')->findOneBy([
                 'name' => $unitName
             ]);
@@ -45,6 +48,24 @@ class ImportUnitsCommand extends Command
                 $unit->setIsCharacter((Boolean) $isCharacter );
                 $this->em->persist($unit);
                 $this->em->flush();
+            }
+            $faction = $this->em->getRepository(Faction::class, 'faction')->findOneBy([
+                'name' => $factionName
+            ]);
+            if ($faction) {
+                $factionUnit = $this->em->getRepository(FactionUnit::class, 'faction_unit')->findOneBy([
+                    'faction_id' => $faction->getId(),
+                    'unit_id' => $unit->getId()
+                ]);
+                if (!$factionUnit) {
+                    $factionU    nit = new FactionUnit();
+                    $factionUnit->setUnit($unit);
+                    $factionUnit->setFaction($faction);
+                    $this->em->persist($factionUnit);
+                    $this->em->flush();
+                }
+            } else {
+                $io->error('Faction ' . $factionName . ' doesn\'t exist.');
             }
             $num++;
         }

@@ -23,8 +23,9 @@ class ArmyController extends AbstractController
     /**
      * @Route("/army/new", name="new-army", methods={"POST"})
      */
-    public function newArmy(): Response
+    public function newArmy(Request $request): Response
     {
+        $user = $this->getUser();
         $entityManager = $this->getDoctrine()->getManager();
         $newArmy = new Army();
         $newArmy->setUserId(1);
@@ -34,8 +35,9 @@ class ArmyController extends AbstractController
         $entityManager->persist($newArmy);
         $entityManager->flush();
         return $this->json([
-            'user_id' => $newArmy->getUserId(),
-            'id' => $newArmy->getId()
+            'user_id' => $user->getId(),
+            'army_id' => $newArmy->getId(),
+            'faction_id' => $newArmy->getFactionId()
         ]);
     }
 }

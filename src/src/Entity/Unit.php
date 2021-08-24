@@ -34,9 +34,15 @@ class Unit
      */
     private $unitAbilities;
 
+    /**
+     * @ORM\OneToMany(targetEntity=FactionUnit::class, mappedBy="unit_id")
+     */
+    private $factionUnits;
+
     public function __construct()
     {
         $this->unitAbilities = new ArrayCollection();
+        $this->factionUnits = new ArrayCollection();
     }
 
 
@@ -93,6 +99,36 @@ class Unit
             // set the owning side to null (unless already changed)
             if ($unitAbility->getUnitId() === $this) {
                 $unitAbility->setUnitId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|FactionUnit[]
+     */
+    public function getFactionUnits(): Collection
+    {
+        return $this->factionUnits;
+    }
+
+    public function addFactionUnit(FactionUnit $factionUnit): self
+    {
+        if (!$this->factionUnits->contains($factionUnit)) {
+            $this->factionUnits[] = $factionUnit;
+            $factionUnit->setUnitId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFactionUnit(FactionUnit $factionUnit): self
+    {
+        if ($this->factionUnits->removeElement($factionUnit)) {
+            // set the owning side to null (unless already changed)
+            if ($factionUnit->getUnitId() === $this) {
+                $factionUnit->setUnitId(null);
             }
         }
 
